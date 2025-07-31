@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF‑8">
+  <title>Soft Summer Overlay</title>
+  <style>
+    body, html { margin:0; padding:0; overflow:hidden; }
+    video { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
+    .palette {
+      position:fixed;
+      top:10px; left:50%;
+      transform:translateX(‑50%);
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(40px, 1fr));
+      gap:4px;
+      opacity:0.75;
+      max-width:320px;
+      pointer-events:none;
+    }
+    .swatch {
+      width:40px; height:40px;
+      border-radius:50%;
+      background-color:gray;
+    }
+    .label {
+      position:fixed;
+      top:10px; left:50%;
+      transform:translateX(‑50%);
+      color:white;
+      font-size:1.2em;
+      pointer-events:none;
+      text-shadow:0 0 4px rgba(0,0,0,0.7);
+    }
+  </style>
+</head>
+<body>
+  <video id="cam" autoplay playsinline></video>
+  <div class="label">Soft Summer</div>
+  <div class="palette" id="palette"></div>
+
+  <script>
+    const colors = [
+      '#A29EA5','#B3A3A9','#94878C','#8E9AA5','#718A8F',
+      '#B5A5B1','#9E8F99','#7E8290','#8DA1AD','#A9B1B1',
+      '#AAA49F','#789AA5','#8C9FA6','#A5A3A5','#859199',
+      '#9A8B8F','#B1A5A5','#A69EA3','#8F8CA1','#7A8B9A',
+      '#A4A2A9','#9FA3A8','#8C9AA2','#A4A5A0','#8F99A1',
+      '#B0A7AD','#9092A0','#8A979F','#A1A2A5','#9DA0A3'
+    ];
+
+    const video = document.getElementById('cam');
+    const palette = document.getElementById('palette');
+    colors.forEach(c => {
+      const d = document.createElement('div');
+      d.className = 'swatch';
+      d.style.backgroundColor = c;
+      palette.appendChild(d);
+    });
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => console.error('Camera error:', err));
+  </script>
+</body>
+</html>
