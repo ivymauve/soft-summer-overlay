@@ -1,65 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF‑8">
-  <title>Soft Summer Overlay</title>
-  <style>
-    body, html { margin:0; padding:0; overflow:hidden; }
-    video { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
-    .palette {
-      position:fixed;
-      top:10px; left:50%;
-      transform:translateX(‑50%);
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(40px, 1fr));
-      gap:4px;
-      opacity:0.75;
-      max-width:320px;
-      pointer-events:none;
-    }
-    .swatch {
-      width:40px; height:40px;
-      border-radius:50%;
-      background-color:gray;
-    }
-    .label {
-      position:fixed;
-      top:10px; left:50%;
-      transform:translateX(‑50%);
-      color:white;
-      font-size:1.2em;
-      pointer-events:none;
-      text-shadow:0 0 4px rgba(0,0,0,0.7);
-    }
-  </style>
-</head>
-<body>
-  <video id="cam" autoplay playsinline></video>
-  <div class="label">Soft Summer</div>
-  <div class="palette" id="palette"></div>
+import { useEffect, useState } from "react";
 
-  <script>
-    const colors = [
-      '#A29EA5','#B3A3A9','#94878C','#8E9AA5','#718A8F',
-      '#B5A5B1','#9E8F99','#7E8290','#8DA1AD','#A9B1B1',
-      '#AAA49F','#789AA5','#8C9FA6','#A5A3A5','#859199',
-      '#9A8B8F','#B1A5A5','#A69EA3','#8F8CA1','#7A8B9A',
-      '#A4A2A9','#9FA3A8','#8C9AA2','#A4A5A0','#8F99A1',
-      '#B0A7AD','#9092A0','#8A979F','#A1A2A5','#9DA0A3'
-    ];
+const softSummerColors = [ // Neutrals "#D8D2CD", "#B9B1A9", "#A39F9A", "#9A8F88", "#7C7C7A", // Blues "#C0CAD6", "#9AB0C9", "#7893AC", "#5E748F", "#4A5C70", // Grays "#D5D5D5", "#A8A8A8", "#8C8C8C", "#747474", // Greens "#B9C1B6", "#A1B3AA", "#7D9B8E", "#5E7D6F", // Pinks "#E2C5CA", "#D3A6B3", "#C2899F", "#AF6D89", // Violets "#C7B0C9", "#B194B6", "#9A7FA3", "#7D668A", // Reds "#B56C76", "#9E4F5A", "#873D49", // Yellows "#F3E3B4", "#E8D897", "#D7C87F", // Browns "#A89988", "#8C7B6F", "#756359" ];
 
-    const video = document.getElementById('cam');
-    const palette = document.getElementById('palette');
-    colors.forEach(c => {
-      const d = document.createElement('div');
-      d.className = 'swatch';
-      d.style.backgroundColor = c;
-      palette.appendChild(d);
-    });
+export default function SoftSummerOverlay() { const [showOverlay, setShowOverlay] = useState(true);
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => { video.srcObject = stream; })
-      .catch(err => console.error('Camera error:', err));
-  </script>
-</body>
-</html>
+useEffect(() => { const preventScroll = (e: TouchEvent) => e.preventDefault(); document.body.style.overflow = "hidden"; document.addEventListener("touchmove", preventScroll, { passive: false }); return () => { document.body.style.overflow = "auto"; document.removeEventListener("touchmove", preventScroll); }; }, []);
+
+return ( <div className="relative w-screen h-screen overflow-hidden"> {/* Toggle Button */} <button onClick={() => setShowOverlay(!showOverlay)} className="absolute top-4 right-4 z-50 bg-white text-gray-800 px-4 py-2 rounded shadow" > {showOverlay ? "Hide Colors" : "Show Colors"} </button>
+
+{/* Overlay */}
+  {showOverlay && (
+    <div className="absolute inset-0 flex flex-wrap justify-center items-center gap-2 p-4 pointer-events-none">
+      {softSummerColors.map((color, index) => (
+        <div
+          key={index}
+          className="w-10 h-10 rounded-full"
+          style={{ backgroundColor: color }}
+        ></div>
+      ))}
+    </div>
+  )}
+
+  {/* Camera feed as background */}
+  <video
+    autoPlay
+    playsInline
+    muted
+    className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+    id="cameraFeed"
+  ></video>
+</div>
+
+); }
+
